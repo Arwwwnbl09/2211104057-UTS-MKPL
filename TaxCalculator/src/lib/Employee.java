@@ -77,10 +77,16 @@ public class Employee {
 		this.annualDeductible = deductible;
 	}
 
+<<<<<<< HEAD
 	// Method ini dihapus karena tidak digunakan (Speculative Generality)
 	// public void setAdditionalIncome(int income) {
 	// this.otherMonthlyIncome = income;
 	// }
+=======
+	public void setAdditionalIncome(int income) {
+		this.otherMonthlyIncome = income;
+	}
+>>>>>>> main
 
 	public void setSpouse(String spouseName, String spouseIdNumber) {
 		this.spouseName = spouseName;
