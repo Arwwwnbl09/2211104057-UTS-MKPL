@@ -32,21 +32,12 @@ public class Employee {
 	}
 
 	private int getBaseSalary(int grade) {
-		int base;
-		switch (grade) {
-			case 1:
-				base = 3000000;
-				break;
-			case 2:
-				base = 5000000;
-				break;
-			case 3:
-				base = 7000000;
-				break;
-			default:
-				base = 0;
-				break;
-		}
+		int base = switch (grade) {
+			case 1 -> 3000000;
+			case 2 -> 5000000;
+			case 3 -> 7000000;
+			default -> 0;
+		};
 		if (personalInfo.isForeigner()) {
 			base *= 1.5;
 		}
@@ -68,15 +59,7 @@ public class Employee {
 	}
 
 	public int getAnnualIncomeTax() {
-		LocalDate date = LocalDate.now();
-
-		int monthWorked;
-		if (date.getYear() == employmentDate.getYearJoined()) {
-			monthWorked = date.getMonthValue() - employmentDate.getMonthJoined();
-		} else {
-			monthWorked = 12;
-		}
-
+		int monthWorked = employmentDate.calculateMonthWorked();
 		return TaxFunction.calculateTax(
 				monthlySalary,
 				otherMonthlyIncome,
@@ -129,5 +112,14 @@ class EmploymentDate {
 
 	public int getMonthJoined() {
 		return monthJoined;
+	}
+
+	public int calculateMonthWorked() {
+		LocalDate currentDate = LocalDate.now();
+		if (currentDate.getYear() == yearJoined) {
+			return currentDate.getMonthValue() - monthJoined;
+		} else {
+			return 12;
+		}
 	}
 }
