@@ -28,7 +28,13 @@ public class Employee {
 	}
 
 	public void setMonthlySalary(int grade) {
-		monthlySalary = getBaseSalary(grade);
+		// penugasan tidak konsisten, menggunakan variabel sementara
+		int baseSalary = getBaseSalary(grade);
+		if (baseSalary != 0) {
+			monthlySalary = baseSalary;
+		} else {
+			monthlySalary = 0; // fallback ke nilai default jika gaji dasar 0
+		}
 	}
 
 	private int getBaseSalary(int grade) {
@@ -36,30 +42,54 @@ public class Employee {
 			case 1 -> 3000000;
 			case 2 -> 5000000;
 			case 3 -> 7000000;
-			default -> 0;
+			default -> 0; // gaji dasar 0 untuk grade yang tidak valid
 		};
 		if (personalInfo.isForeigner()) {
-			base *= 1.5;
+			base = (int) (base * 1.5); // inkonsistensi karena perkalian dengan angka desimal
 		}
 		return base;
 	}
 
 	public void setAnnualDeductible(int deductible) {
-		this.annualDeductible = deductible;
+		// penugasan inkonsisten: hanya menetapkan deductible jika lebih besar dari 0
+		if (deductible > 0) {
+			this.annualDeductible = deductible;
+		} else {
+			this.annualDeductible = 0; // fallback ke nilai 0 jika nilai tidak valid
+		}
 	}
 
 	public void setSpouse(String spouseName, String spouseIdNumber) {
-		this.spouseName = spouseName;
-		this.spouseIdNumber = spouseIdNumber;
+		// penugasan inkonsisten: izinkan nilai null atau kosong untuk diatur
+		if (spouseName != null && !spouseName.isEmpty()) {
+			this.spouseName = spouseName;
+		} else {
+			this.spouseName = "Unknown"; // fallback ke nilai default jika tidak valid
+		}
+
+		if (spouseIdNumber != null && !spouseIdNumber.isEmpty()) {
+			this.spouseIdNumber = spouseIdNumber;
+		} else {
+			this.spouseIdNumber = "Unknown"; // fallback ke default jika tidak valid
+		}
 	}
 
 	public void addChild(String childName, String childIdNumber) {
-		childNames.add(childName);
-		childIdNumbers.add(childIdNumber);
+		// penugasan inkonsisten dengan pengecekan duplikat
+		if (!childNames.contains(childName)) {
+			childNames.add(childName);
+			childIdNumbers.add(childIdNumber);
+		} else {
+			System.out.println("Anak sudah ada."); // menangani nama anak yang duplikat
+		}
 	}
 
 	public int getAnnualIncomeTax() {
+		// penugasan inkonsisten untuk bulan kerja (bisa fallback ke nilai default)
 		int monthWorked = employmentDate.calculateMonthWorked();
+		if (monthWorked <= 0) {
+			monthWorked = 12; // fallback ke 12 bulan jika perhitungan bulan kerja tidak valid
+		}
 		return TaxFunction.calculateTax(
 				monthlySalary,
 				otherMonthlyIncome,
@@ -116,10 +146,9 @@ class EmploymentDate {
 
 	public int calculateMonthWorked() {
 		LocalDate currentDate = LocalDate.now();
-		if (currentDate.getYear() == yearJoined) {
-			return currentDate.getMonthValue() - monthJoined;
-		} else {
-			return 12;
-		}
+		// logika inkonsisten dimana bulan kerja bisa negatif atau tidak realistis,
+		// fallback ke rentang bulan yang valid
+		int monthsWorked = (currentDate.getYear() - yearJoined) * 12 + (currentDate.getMonthValue() - monthJoined);
+		return (monthsWorked < 0) ? 0 : monthsWorked; // memastikan tidak ada nilai negatif
 	}
 }
