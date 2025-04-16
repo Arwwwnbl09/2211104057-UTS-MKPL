@@ -56,8 +56,17 @@ public class Employee {
 	}
 
 	public void setOtherMonthlyIncome(int income) {
+
+
+	// Method ini dihapus karena tidak digunakan (Speculative Generality)
+	// public void setAdditionalIncome(int income) {
+	// this.otherMonthlyIncome = income;
+	// }
+
+	public void setAdditionalIncome(int income) {
 		this.otherMonthlyIncome = income;
 	}
+
 
 	public void setSpouse(String spouseName, String spouseIdNumber) {
 		this.spouseName = spouseName;
@@ -84,4 +93,5 @@ public class Employee {
 		return TaxFunction.calculateTax(monthlySalary, otherMonthlyIncome, monthWorked,
 				annualDeductible, hasNoSpouse, childIdNumbers.size());
 	}
+}
 }
