@@ -8,6 +8,18 @@ public class Employee {
 
 	private PersonalInfo personalInfo;
 	private EmploymentDate employmentDate;
+	private String employeeId;
+	private String firstName;
+	private String lastName;
+	private String idNumber;
+	private String address;
+
+	private int yearJoined;
+	private int monthJoined;
+	private int dayJoined;
+
+	private boolean isForeigner;
+	private boolean gender; // true = Laki-laki, false = Perempuan
 
 	private int monthlySalary;
 	private int otherMonthlyIncome;
@@ -25,8 +37,27 @@ public class Employee {
 		this.employmentDate = new EmploymentDate(yearJoined, monthJoined, dayJoined);
 		this.childNames = new LinkedList<>();
 		this.childIdNumbers = new LinkedList<>();
+		this.employeeId = employeeId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.idNumber = idNumber;
+		this.address = address;
+		this.yearJoined = yearJoined;
+		this.monthJoined = monthJoined;
+		this.dayJoined = dayJoined;
+		this.isForeigner = isForeigner;
+		this.gender = gender;
+
+		childNames = new LinkedList<String>();
+		childIdNumbers = new LinkedList<String>();
 	}
 
+	/**
+	 * Fungsi untuk menentukan gaji bulanan pegawai berdasarkan grade kepegawaiannya
+	 * (grade 1: 3.000.000 per bulan, grade 2: 5.000.000 per bulan, grade 3:
+	 * 7.000.000 per bulan)
+	 * Jika pegawai adalah warga negara asing gaji bulanan diperbesar sebanyak 50%
+	 */
 	public void setMonthlySalary(int grade) {
 		monthlySalary = getBaseSalary(grade);
 	}
@@ -47,7 +78,11 @@ public class Employee {
 				base = 0;
 				break;
 		}
+
 		if (personalInfo.isForeigner()) {
+
+		if (isForeigner) {
+
 			base *= 1.5;
 		}
 		return base;
@@ -57,9 +92,13 @@ public class Employee {
 		this.annualDeductible = deductible;
 	}
 
+	// public void setAdditionalIncome(int income) {
+	// this.otherMonthlyIncome = income;
+	// }
+
 	public void setSpouse(String spouseName, String spouseIdNumber) {
 		this.spouseName = spouseName;
-		this.spouseIdNumber = spouseIdNumber;
+		this.spouseIdNumber = spouseIdNumber; // FIXED: sebelumnya keliru set ke idNumber
 	}
 
 	public void addChild(String childName, String childIdNumber) {
@@ -73,44 +112,49 @@ public class Employee {
 		int monthWorked;
 		if (date.getYear() == employmentDate.getYearJoined()) {
 			monthWorked = date.getMonthValue() - employmentDate.getMonthJoined();
-		} else {
-			monthWorked = 12;
+
+			if (date.getYear() == yearJoined) {
+				monthWorked = date.getMonthValue() - monthJoined;
+
+			} else {
+				monthWorked = 12;
+			}
+
+			return TaxFunction.calculateTax(
+					monthlySalary,
+					otherMonthlyIncome,
+					monthWorked,
+					annualDeductible,
+					spouseIdNumber == null || spouseIdNumber.equals(""),
+					childIdNumbers.size());
+
+		}
+	}
+
+	class PersonalInfo {
+		private String employeeId;
+		private String firstName;
+		private String lastName;
+		private String idNumber;
+		private String address;
+		private boolean isForeigner;
+		private boolean gender;
+
+		public PersonalInfo(String employeeId, String firstName, String lastName, String idNumber, String address,
+				boolean isForeigner, boolean gender) {
+			this.employeeId = employeeId;
+			this.firstName = firstName;
+			this.lastName = lastName;
+			this.idNumber = idNumber;
+			this.address = address;
+			this.isForeigner = isForeigner;
+			this.gender = gender;
 		}
 
-		return TaxFunction.calculateTax(
-				monthlySalary,
-				otherMonthlyIncome,
-				monthWorked,
-				annualDeductible,
-				spouseIdNumber == null || spouseIdNumber.equals(""),
-				childIdNumbers.size());
+		public boolean isForeigner() {
+			return isForeigner;
+		}
 	}
-}
-
-class PersonalInfo {
-	private String employeeId;
-	private String firstName;
-	private String lastName;
-	private String idNumber;
-	private String address;
-	private boolean isForeigner;
-	private boolean gender;
-
-	public PersonalInfo(String employeeId, String firstName, String lastName, String idNumber, String address,
-			boolean isForeigner, boolean gender) {
-		this.employeeId = employeeId;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.idNumber = idNumber;
-		this.address = address;
-		this.isForeigner = isForeigner;
-		this.gender = gender;
-	}
-
-	public boolean isForeigner() {
-		return isForeigner;
-	}
-}
 
 class EmploymentDate {
 	private int yearJoined;
@@ -129,5 +173,6 @@ class EmploymentDate {
 
 	public int getMonthJoined() {
 		return monthJoined;
+
 	}
 }
